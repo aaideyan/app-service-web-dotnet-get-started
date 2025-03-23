@@ -14,7 +14,14 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
+
 steps:
+- task: SonarQubePrepare@7
+  inputs:
+    SonarQube: 'dotnetSonar'
+    scannerMode: 'dotnet'
+    projectKey: 'dotnet_dotnet_f071acfe-e808-4dc7-bbe7-3baf13a39273'
+    
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
@@ -27,8 +34,15 @@ steps:
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    
+- task: SonarQubeAnalyze@7
+  inputs:
+      jdkversion: 'JAVA_HOME_17_X64'
 
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+- task: SonarQubePublish@7
+  inputs:
+        pollingTimeoutSec: '300'
